@@ -214,7 +214,7 @@ class FileHelperTest extends TestCase
 
         $helper = new FileHelper($filesModelAdapter, $frontendAdapter);
 
-        $helper->prepareImageForTemplate(['option1' => 'value1', 'option2' => 'value2']);
+        $helper->prepareImageForTemplate('uuid', ['option1' => 'value1', 'option2' => 'value2']);
     }
 
     /**
@@ -250,20 +250,11 @@ class FileHelperTest extends TestCase
         ];
 
         $filesModelAdapter
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('findByUuid')
             ->with('the-uuid')
             ->willReturn($fileModelMock);
 
-        $frontendAdapter
-            ->expects($this->once())
-            ->method('getMetaData')
-            ->with(['file-meta-data'], 'en_EN')
-            ->willReturn([
-                'title'   => 'Title',
-                'link'    => 'https://example.org',
-                'caption' => 'File caption!'
-            ]);
         $frontendAdapter
             ->expects($this->once())
             ->method('addImageToTemplate')
@@ -274,10 +265,7 @@ class FileHelperTest extends TestCase
                     'uuid'       => 'the-uuid',
                     'name'       => 'file.ext',
                     'singleSRC'  => 'some/path/file.ext',
-                    'additional' => 'attribute',
-                    'alt'        => 'Title',
-                    'imageUrl'   => 'https://example.org',
-                    'caption'    => 'File caption!'
+                    'additional' => 'attribute'
                 ]
             )
             ->willReturnCallback(function ($image) { $image->result = 'Success!';});
@@ -296,7 +284,7 @@ class FileHelperTest extends TestCase
         /** @var FileHelper $helper */
         $this->assertSame(
             'Success!',
-            $helper->tryPrepareImageForTemplate('the-uuid', ['additional' => 'attribute'], true)->result
+            $helper->tryPrepareImageForTemplate('the-uuid', ['additional' => 'attribute'])->result
         );
     }
 
